@@ -193,12 +193,82 @@ class GJ_EncodeVideo:
         return {"ui": {"images": [preview], "animated": (True,)}, "result": (video,)}
 
 
+def _saved_videos():
+    """MP4 files under output/genjutsu, newest first, as paths relative to the output folder."""
+    root = folder_paths.get_output_directory()
+    base = os.path.join(root, "genjutsu")
+    found = []
+    if os.path.isdir(base):
+        for dirpath, _, files in os.walk(base):
+            for f in files:
+                if f.lower().endswith(".mp4"):
+                    full = os.path.join(dirpath, f)
+                    found.append((os.path.getmtime(full), os.path.relpath(full, root)))
+    found.sort(reverse=True)
+    return [p.replace(os.sep, "/") for _, p in found]
+
+
+class GJ_LoadSavedVideo:
+    """
+    Load an MP4 already written by GJ Encode Video (output/genjutsu) as a native VIDEO file,
+    so the Seedance pass can run alone without recomputing Demucs, SAM3 and depth.
+    'latest' picks the newest file whose name starts with the prefix. Press R in ComfyUI to refresh the list.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "file": (["latest"] + _saved_videos(), {"default": "latest"}),
+                "latest_prefix": ("STRING", {"default": "seedance_input"}),
+            }
+        }
+
+    RETURN_TYPES = ("VIDEO", "STRING")
+    RETURN_NAMES = ("video", "path")
+    FUNCTION = "run"
+    CATEGORY = "Genjutsu"
+
+    @classmethod
+    def _resolve(cls, file, latest_prefix):
+        root = folder_paths.get_output_directory()
+        if file == "latest":
+            for rel in _saved_videos():
+                if os.path.basename(rel).startswith(latest_prefix):
+                    return os.path.join(root, rel)
+            raise FileNotFoundError(f"No MP4 starting with '{latest_prefix}' in {os.path.join(root, 'genjutsu')}")
+        path = os.path.join(root, file)
+        if not os.path.isfile(path):
+            raise FileNotFoundError(path)
+        return path
+
+    @classmethod
+    def IS_CHANGED(cls, file, latest_prefix):
+        try:
+            path = cls._resolve(file, latest_prefix)
+            return f"{path}:{os.path.getmtime(path)}"
+        except FileNotFoundError:
+            return float("nan")
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, file, latest_prefix):
+        return True
+
+    def run(self, file, latest_prefix):
+        from comfy_api.latest import InputImpl
+        path = self._resolve(file, latest_prefix)
+        print(f"[Genjutsu] Loading saved video {path}")
+        return (InputImpl.VideoFromFile(path), path)
+
+
 NODE_CLASS_MAPPINGS = {
     "GJ_PitchShift": GJ_PitchShift,
     "GJ_EncodeVideo": GJ_EncodeVideo,
+    "GJ_LoadSavedVideo": GJ_LoadSavedVideo,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "GJ_PitchShift": "GJ Pitch Shift (duration preserved)",
     "GJ_EncodeVideo": "GJ Encode Video (MP4 file)",
+    "GJ_LoadSavedVideo": "GJ Load Saved Video (skip recompute)",
 }

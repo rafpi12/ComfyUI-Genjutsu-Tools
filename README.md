@@ -19,6 +19,7 @@ https://github.com/sirioberati/Genjustsu-Open-Source-Workflow
 |---|---|
 | GJ Pitch Shift | Pitch en demi-tons, duree conservee. Rubber Band CLI si installe (memes reglages que l'original), sinon librosa |
 | GJ Encode Video | Frames + audio vers MP4 H.264/AAC dans `output/`, renvoye en VIDEO fichier (necessaire pour que WaveSpeed l'uploade) |
+| GJ Load Saved Video | Recharge un MP4 deja sauvegarde dans `output/genjutsu` (`latest` = le plus recent) pour relancer Seedance sans recalculer la preparation |
 
 ## Installation sur le pod
 
