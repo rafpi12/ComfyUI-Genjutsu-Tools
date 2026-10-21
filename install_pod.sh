@@ -22,7 +22,7 @@ echo "==> Python  : $PY"
 # 1. Custom nodes externes
 clone_or_pull () {
   local url="$1" dir="$NODES/$(basename "$1" .git)"
-  if [ -d "$dir/.git" ]; then echo "==> Update $(basename "$dir")"; git -C "$dir" pull --ff-only || true
+  if [ -d "$dir/.git" ]; then echo "==> Update $(basename "$dir")"; git -C "$dir" checkout -- . 2>/dev/null || true; git -C "$dir" pull --ff-only || true
   else echo "==> Clone $(basename "$dir")"; git clone --depth 1 "$url" "$dir"; fi
   if [ -f "$dir/requirements.txt" ]; then "$PY" -m pip install -q -r "$dir/requirements.txt"; fi
 }
@@ -31,6 +31,14 @@ clone_or_pull https://github.com/christian-byrne/audio-separation-nodes-comfyui.
 clone_or_pull https://github.com/yuvraj108c/ComfyUI-Video-Depth-Anything.git
 clone_or_pull https://github.com/WaveSpeedAI/wavespeed-comfyui.git
 "$PY" -m pip install -q -r "$HERE/requirements.txt"
+
+# Patch Video Depth Anything : matplotlib >= 3.9 n'a plus cm.get_cmap (colormap inferno)
+VDA="$NODES/ComfyUI-Video-Depth-Anything"
+FILES=$(grep -rl 'cm\.get_cmap(' --include=*.py "$VDA" 2>/dev/null || true)
+if [ -n "$FILES" ]; then
+  echo "==> Patch Video Depth Anything (matplotlib get_cmap)"
+  echo "$FILES" | xargs sed -i 's/cm\.get_cmap(\("[A-Za-z_]*"\))/__import__("matplotlib").colormaps[\1]/g'
+fi
 
 # 2. Rubber Band (optionnel, sinon fallback librosa)
 if ! command -v rubberband >/dev/null 2>&1; then
