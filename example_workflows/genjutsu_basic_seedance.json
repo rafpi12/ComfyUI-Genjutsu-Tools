@@ -1,0 +1,585 @@
+{
+ "id": "89a55f60-914a-4b83-873b-58badf970092",
+ "revision": 0,
+ "last_node_id": 10,
+ "last_link_id": 8,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "LoadVideo",
+   "pos": [
+    40,
+    120
+   ],
+   "size": [
+    360,
+    520
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VIDEO",
+     "type": "VIDEO",
+     "links": [
+      1,
+      5
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadVideo"
+   },
+   "widgets_values": [
+    "source.mp4",
+    "image"
+   ],
+   "title": "Source video (4-30 s)"
+  },
+  {
+   "id": 2,
+   "type": "LoadImage",
+   "pos": [
+    40,
+    690
+   ],
+   "size": [
+    360,
+    420
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      2
+     ]
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "character_ref.png",
+    "image"
+   ],
+   "title": "Character reference 1"
+  },
+  {
+   "id": 3,
+   "type": "WaveSpeedAIPredictor",
+   "pos": [
+    460,
+    120
+   ],
+   "size": [
+    800,
+    1200
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "video",
+     "type": "*",
+     "link": 1,
+     "widget": {
+      "name": "video"
+     }
+    },
+    {
+     "name": "reference_image_0",
+     "type": "*",
+     "link": 2,
+     "widget": {
+      "name": "reference_image_0"
+     }
+    }
+   ],
+   "outputs": [
+    {
+     "name": "output_url",
+     "type": "*",
+     "links": [
+      3
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "WaveSpeedAIPredictor"
+   },
+   "widgets_values": [
+    "/api/v3/bytedance/seedance-2.5/video-edit",
+    "{\"prompt\": \"Replace the person in the input video with the character from reference image 1, including face, hair and outfit. Keep the same motion, lip sync, background, camera movement and duration. The input video's audio is preserved unchanged.\", \"resolution\": \"480p\", \"generate_audio\": false}",
+    "{\"prompt\": {\"type\": \"string\"}, \"video\": {\"type\": \"string\"}, \"reference_images\": {\"type\": \"string\", \"isArray\": true, \"itemType\": \"string\"}, \"reference_audios\": {\"type\": \"string\", \"isArray\": true, \"itemType\": \"string\"}, \"resolution\": {\"type\": \"string\", \"options\": [\"480p\", \"720p\", \"1080p\", \"4k\"]}, \"generate_audio\": {\"type\": \"boolean\"}}",
+    "{\"prompt\": {\"type\": \"string\"}, \"video\": {\"type\": \"string\"}, \"reference_images\": {\"type\": \"string\", \"isArray\": true, \"itemType\": \"string\"}, \"reference_audios\": {\"type\": \"string\", \"isArray\": true, \"itemType\": \"string\"}, \"resolution\": {\"type\": \"string\", \"options\": [\"480p\", \"720p\", \"1080p\", \"4k\"]}, \"generate_audio\": {\"type\": \"boolean\"}}",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+   ],
+   "title": "Seedance 2.5 Video Edit (WaveSpeed)",
+   "color": "#322",
+   "bgcolor": "#533",
+   "wavespeed": {
+    "modelId": "bytedance/seedance-2.5/video-edit",
+    "apiPath": "/api/v3/bytedance/seedance-2.5/video-edit",
+    "category": "all",
+    "parameterValues": {
+     "prompt": "Replace the person in the input video with the character from reference image 1, including face, hair and outfit. Keep the same motion, lip sync, background, camera movement and duration. The input video's audio is preserved unchanged.",
+     "video": "",
+     "reference_image_0": "",
+     "reference_image_1": "",
+     "reference_image_2": "",
+     "reference_image_3": "",
+     "reference_image_4": "",
+     "reference_audio_0": "",
+     "reference_audio_1": "",
+     "reference_audio_2": "",
+     "reference_audio_3": "",
+     "reference_audio_4": "",
+     "resolution": "480p",
+     "generate_audio": false
+    },
+    "requestJsonValue": "{\"prompt\": \"Replace the person in the input video with the character from reference image 1, including face, hair and outfit. Keep the same motion, lip sync, background, camera movement and duration. The input video's audio is preserved unchanged.\", \"resolution\": \"480p\", \"generate_audio\": false}",
+    "savedInputs": [
+     {
+      "name": "prompt",
+      "type": "*",
+      "link": null
+     },
+     {
+      "name": "video",
+      "type": "*",
+      "link": 1
+     },
+     {
+      "name": "reference_image_0",
+      "type": "*",
+      "link": 2,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_images",
+      "arrayIndex": 0
+     },
+     {
+      "name": "reference_image_1",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_images",
+      "arrayIndex": 1
+     },
+     {
+      "name": "reference_image_2",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_images",
+      "arrayIndex": 2
+     },
+     {
+      "name": "reference_image_3",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_images",
+      "arrayIndex": 3
+     },
+     {
+      "name": "reference_image_4",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_images",
+      "arrayIndex": 4
+     },
+     {
+      "name": "reference_audio_0",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_audios",
+      "arrayIndex": 0
+     },
+     {
+      "name": "reference_audio_1",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_audios",
+      "arrayIndex": 1
+     },
+     {
+      "name": "reference_audio_2",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_audios",
+      "arrayIndex": 2
+     },
+     {
+      "name": "reference_audio_3",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_audios",
+      "arrayIndex": 3
+     },
+     {
+      "name": "reference_audio_4",
+      "type": "*",
+      "link": null,
+      "isExpandedArrayItem": true,
+      "parentArray": "reference_audios",
+      "arrayIndex": 4
+     },
+     {
+      "name": "resolution",
+      "type": "*",
+      "link": null
+     },
+     {
+      "name": "generate_audio",
+      "type": "*",
+      "link": null
+     }
+    ]
+   }
+  },
+  {
+   "id": 4,
+   "type": "WaveSpeedAI Preview",
+   "pos": [
+    1320,
+    120
+   ],
+   "size": [
+    360,
+    300
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "input_url",
+     "type": "*",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": []
+    },
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "links": [
+      4
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "WaveSpeedAI Preview"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 5,
+   "type": "GetVideoComponents",
+   "pos": [
+    1320,
+    470
+   ],
+   "size": [
+    360,
+    120
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": [
+      6
+     ]
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "links": []
+    },
+    {
+     "name": "fps",
+     "type": "FLOAT",
+     "links": [
+      7
+     ]
+    },
+    {
+     "name": "bit_depth",
+     "type": "COMBO",
+     "links": []
+    },
+    {
+     "name": "color_space",
+     "type": "COMBO",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GetVideoComponents"
+   },
+   "widgets_values": [],
+   "title": "Result frames"
+  },
+  {
+   "id": 6,
+   "type": "GetVideoComponents",
+   "pos": [
+    40,
+    1160
+   ],
+   "size": [
+    360,
+    120
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "links": []
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "links": [
+      8
+     ]
+    },
+    {
+     "name": "fps",
+     "type": "FLOAT",
+     "links": []
+    },
+    {
+     "name": "bit_depth",
+     "type": "COMBO",
+     "links": []
+    },
+    {
+     "name": "color_space",
+     "type": "COMBO",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GetVideoComponents"
+   },
+   "widgets_values": [],
+   "title": "Source audio"
+  },
+  {
+   "id": 7,
+   "type": "GJ_EncodeVideo",
+   "pos": [
+    1320,
+    640
+   ],
+   "size": [
+    420,
+    420
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 6
+    },
+    {
+     "name": "fps",
+     "type": "FLOAT",
+     "link": 7,
+     "widget": {
+      "name": "fps"
+     }
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "video",
+     "type": "VIDEO",
+     "links": []
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GJ_EncodeVideo"
+   },
+   "widgets_values": [
+    24.0,
+    "genjutsu/seedance_basic",
+    18
+   ],
+   "title": "FINAL: result + original audio",
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 10,
+   "type": "MarkdownNote",
+   "pos": [
+    1760,
+    120
+   ],
+   "size": [
+    520,
+    420
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "MarkdownNote"
+   },
+   "widgets_values": [
+    "# Genjutsu basique : Seedance (WaveSpeed)\n\nTa video + ta ref + le prompt, direct dans Seedance video-edit. Pas de masque, pas de depth, pas de pitch.\n\n1. Charge ta video (4 a 30 s) et ta ref perso.\n2. Verifie le prompt et la resolution (480p pour tester).\n3. Queue. **Chaque Queue est payante** (environ 0,11 $/s entree + sortie en 480p).\n\nLe FINAL remet l'audio original de ta video.\nAttention : sans le masquage depth, une personne reelle dans la video source peut declencher le filtre visage de Seedance, et les persos sous copyright restent bloques."
+   ],
+   "title": "Mode d'emploi",
+   "color": "#223",
+   "bgcolor": "#335"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   3,
+   0,
+   "VIDEO"
+  ],
+  [
+   2,
+   2,
+   0,
+   3,
+   1,
+   "IMAGE"
+  ],
+  [
+   3,
+   3,
+   0,
+   4,
+   0,
+   "*"
+  ],
+  [
+   4,
+   4,
+   1,
+   5,
+   0,
+   "VIDEO"
+  ],
+  [
+   5,
+   1,
+   0,
+   6,
+   0,
+   "VIDEO"
+  ],
+  [
+   6,
+   5,
+   0,
+   7,
+   0,
+   "IMAGE"
+  ],
+  [
+   7,
+   5,
+   2,
+   7,
+   1,
+   "FLOAT"
+  ],
+  [
+   8,
+   6,
+   1,
+   7,
+   2,
+   "AUDIO"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.7,
+   "offset": [
+    200,
+    300
+   ]
+  }
+ },
+ "version": 0.4
+}

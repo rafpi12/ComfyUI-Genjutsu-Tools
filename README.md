@@ -1,6 +1,8 @@
 # Genjutsu pour ComfyUI
 
-Deux workflows dans `example_workflows/` :
+Workflows dans `example_workflows/` :
+- `genjutsu_basic_seedance.json` : basique, video + ref + prompt direct dans Seedance video-edit (WaveSpeed).
+- `genjutsu_basic_minimax_h3.json` : basique, MiniMax H3 local, la video sert de reference de mouvement et d'audio.
 - `genjutsu_advanced_depth_sam3.json` : Seedance via WaveSpeed (API, payant).
 - `genjutsu_minimax_h3_depth_inpaint.json` : MiniMax H3 en local (Fun ControlNet depth + masque SAM3, lip sync sur la voix isolee).
 
