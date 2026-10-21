@@ -51,17 +51,32 @@ def _fit_length(samples, n):
 
 
 def _pitch_rubberband(samples, sr, semitones, binary):
+    """
+    Try the original Genjutsu flags first (--fine = R3 engine, Rubber Band v3+),
+    then the default engine for older builds (Ubuntu 22.04 ships v2.x without --fine).
+    Raises RuntimeError with Rubber Band's own message if every attempt fails.
+    """
     with tempfile.TemporaryDirectory() as tmp:
         src = os.path.join(tmp, "in.wav")
         dst = os.path.join(tmp, "out.wav")
         _write_wav(src, samples, sr)
-        # Same flags as the original Genjutsu workflow
-        subprocess.run(
-            [binary, "--fine", "--pitch", str(semitones), "--time", "1", src, dst],
-            check=True, capture_output=True,
-        )
-        out, _ = _read_wav(dst)
-    return out
+        attempts = [
+            ["--fine", "--pitch", str(semitones), "--time", "1"],
+            ["--pitch", str(semitones), "--time", "1"],
+        ]
+        errors = []
+        for flags in attempts:
+            if os.path.exists(dst):
+                os.remove(dst)
+            proc = subprocess.run([binary, *flags, src, dst], capture_output=True, text=True)
+            if proc.returncode == 0 and os.path.exists(dst) and os.path.getsize(dst) > 44:
+                if flags[0] != "--fine":
+                    print("[Genjutsu] Rubber Band without --fine (older version, default engine)")
+                out, _ = _read_wav(dst)
+                return out
+            msg = (proc.stderr or proc.stdout or "").strip().splitlines()
+            errors.append(f"{' '.join(flags)} -> exit {proc.returncode}: {msg[-1] if msg else 'no output'}")
+        raise RuntimeError("Rubber Band failed: " + " | ".join(errors))
 
 
 def _pitch_librosa(samples, sr, semitones):
@@ -108,7 +123,16 @@ class GJ_PitchShift:
         for b in range(waveform.shape[0]):
             samples = waveform[b].detach().cpu().float().numpy()
             n = samples.shape[1]
-            shifted = _pitch_rubberband(samples, sr, semitones, binary) if use_rb else _pitch_librosa(samples, sr, semitones)
+            if use_rb:
+                try:
+                    shifted = _pitch_rubberband(samples, sr, semitones, binary)
+                except RuntimeError as e:
+                    if engine == "rubberband":
+                        raise
+                    print(f"[Genjutsu] {e}. Falling back to librosa.")
+                    shifted = _pitch_librosa(samples, sr, semitones)
+            else:
+                shifted = _pitch_librosa(samples, sr, semitones)
             if shifted.shape[0] != samples.shape[0]:
                 shifted = np.repeat(shifted[:1], samples.shape[0], axis=0)
             out_batches.append(torch.from_numpy(_fit_length(shifted, n)))
