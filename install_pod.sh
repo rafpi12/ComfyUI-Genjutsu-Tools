@@ -46,17 +46,29 @@ if ! command -v rubberband >/dev/null 2>&1; then
   (apt-get update -qq && apt-get install -y -qq rubberband-cli) || echo "   Rubber Band non installe, le node utilisera librosa"
 fi
 
-# 3. Checkpoint SAM 3.1
-CKPT="$COMFY/models/checkpoints/sam3.1_multiplex_fp16.safetensors"
-URL="https://huggingface.co/Comfy-Org/sam3.1/resolve/main/checkpoints/sam3.1_multiplex_fp16.safetensors"
-if [ ! -s "$CKPT" ]; then
-  echo "==> Download SAM 3.1"
-  mkdir -p "$(dirname "$CKPT")"
+# 3. Modeles
+dl () {  # dl <dossier models/...> <url>
+  local dest="$COMFY/models/$1/$(basename "$2")"
+  [ -s "$dest" ] && return 0
+  echo "==> Download $(basename "$2")"
+  mkdir -p "$(dirname "$dest")"
   if command -v aria2c >/dev/null 2>&1; then
-    aria2c -x 8 -s 8 -d "$(dirname "$CKPT")" -o "$(basename "$CKPT")" "$URL"
+    aria2c -q -x 8 -s 8 -d "$(dirname "$dest")" -o "$(basename "$dest")" "$2"
   else
-    wget -q --show-progress -O "$CKPT" "$URL"
+    wget -q --show-progress -O "$dest" "$2"
   fi
+}
+dl checkpoints "https://huggingface.co/Comfy-Org/sam3.1/resolve/main/checkpoints/sam3.1_multiplex_fp16.safetensors"
+
+# Workflow MiniMax H3 (environ 40 Go) : seulement si MINIMAX=1
+if [ "${MINIMAX:-0}" = "1" ]; then
+  H3="https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main"
+  dl diffusion_models "$H3/diffusion_models/minimax_h3_ref2va_pruned_int8_convrot.safetensors"
+  dl text_encoders "$H3/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors"
+  dl vae "$H3/vae/minimax_h3_video_vae_int8_convrot.safetensors"
+  dl vae "$H3/vae/minimax_h3_audio_vae_fp32.safetensors"
+  dl model_patches "$H3/model_patches/minimax_h3_fun_controlnet_union_pruned_int8_convrot.safetensors"
+  dl loras "$H3/loras/minimax_h3_ref2v_turbo_4step_v0.1_comfyui_bf16.safetensors"
 fi
 
 # 4. Workflow visible dans le menu Workflows de ComfyUI

@@ -1,4 +1,10 @@
-# Genjutsu pour ComfyUI (mode Advanced : depth + SAM3)
+# Genjutsu pour ComfyUI
+
+Deux workflows dans `example_workflows/` :
+- `genjutsu_advanced_depth_sam3.json` : Seedance via WaveSpeed (API, payant).
+- `genjutsu_minimax_h3_depth_inpaint.json` : MiniMax H3 en local (Fun ControlNet depth + masque SAM3, lip sync sur la voix isolee).
+
+## Workflow Seedance (mode Advanced : depth + SAM3)
 
 Adaptation ComfyUI du workflow open source Genjustsu (TEIN, MIT) :
 https://github.com/sirioberati/Genjustsu-Open-Source-Workflow
@@ -19,6 +25,7 @@ https://github.com/sirioberati/Genjustsu-Open-Source-Workflow
 |---|---|
 | GJ Pitch Shift | Pitch en demi-tons, duree conservee. Rubber Band CLI si installe (memes reglages que l'original), sinon librosa |
 | GJ Encode Video | Frames + audio vers MP4 H.264/AAC dans `output/`, renvoye en VIDEO fichier (necessaire pour que WaveSpeed l'uploade) |
+| GJ Fit To Grid | Taille multiple de 32 et duree sur la grille 17n+5 frames de MiniMax H3, sort width/height/length |
 | GJ Load Saved Video | Recharge un MP4 deja sauvegarde dans `output/genjutsu` (`latest` = le plus recent) pour relancer Seedance sans recalculer la preparation |
 
 ## Installation sur le pod
@@ -37,6 +44,12 @@ Ensuite : redemarre ComfyUI, puis Settings, WaveSpeed, colle ta cle API.
 
 Telechargement automatique au premier lancement : Video Depth Anything (vers `models/videodepthanything`) et Demucs (cache torchaudio).
 Prerequis : ComfyUI v0.20.0 ou plus recent (SAM3 natif).
+
+Modeles MiniMax H3 (environ 40 Go, ignores s'ils sont deja la) :
+
+```bash
+MINIMAX=1 bash /workspace/ComfyUI/custom_nodes/ComfyUI-Genjutsu-Tools/install_pod.sh
+```
 
 Mise a jour du pack :
 

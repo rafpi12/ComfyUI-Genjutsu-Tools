@@ -193,6 +193,58 @@ class GJ_EncodeVideo:
         return {"ui": {"images": [preview], "animated": (True,)}, "result": (video,)}
 
 
+class GJ_FitToGrid:
+    """
+    Resize frames so the longest side is about max_side, with width/height on a multiple grid
+    (center crop keeps the aspect ratio), and trim the frame count to the model's grid
+    (17n+5 for MiniMax H3). Outputs the sizes to feed the generation node.
+    """
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "images": ("IMAGE",),
+                "max_side": ("INT", {"default": 960, "min": 64, "max": 4096, "step": 32}),
+                "multiple": ("INT", {"default": 32, "min": 1, "max": 256}),
+                "frame_grid": (["17n+5 (MiniMax H3)", "none"], {"default": "17n+5 (MiniMax H3)"}),
+                "max_frames": ("INT", {"default": 362, "min": 5, "max": 3600}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE", "INT", "INT", "INT")
+    RETURN_NAMES = ("images", "width", "height", "length")
+    FUNCTION = "run"
+    CATEGORY = "Genjutsu"
+
+    def run(self, images, max_side, multiple, frame_grid, max_frames):
+        import comfy.utils
+
+        n = min(images.shape[0], max_frames)
+        if frame_grid.startswith("17n+5"):
+            if n < 5:
+                images = torch.cat([images, images[-1:].repeat(5 - n, 1, 1, 1)], dim=0)
+                n = 5
+            n -= (n - 5) % 17
+        images = images[:n]
+
+        h, w = images.shape[1], images.shape[2]
+        scale = min(1.0, max_side / max(h, w))
+        tw = max(multiple, int(round(w * scale / multiple)) * multiple)
+        th = max(multiple, int(round(h * scale / multiple)) * multiple)
+        if (tw, th) != (w, h):
+            # chunked: lanczos goes through PIL and multiplies memory on long clips
+            chunks = []
+            for i in range(0, n, 16):
+                part = images[i:i + 16].movedim(-1, 1)
+                chunks.append(comfy.utils.common_upscale(part, tw, th, "lanczos", "center").movedim(1, -1).clamp(0, 1))
+            out = torch.cat(chunks, dim=0)
+        else:
+            out = images
+        print(f"[Genjutsu] Fit to grid: {w}x{h} -> {tw}x{th}, {n} frames ({n / 24:.2f} s at 24 fps)")
+        return (out, tw, th, n)
+
+
 def _saved_videos():
     """MP4 files under output/genjutsu, newest first, as paths relative to the output folder."""
     root = folder_paths.get_output_directory()
@@ -265,10 +317,12 @@ NODE_CLASS_MAPPINGS = {
     "GJ_PitchShift": GJ_PitchShift,
     "GJ_EncodeVideo": GJ_EncodeVideo,
     "GJ_LoadSavedVideo": GJ_LoadSavedVideo,
+    "GJ_FitToGrid": GJ_FitToGrid,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "GJ_PitchShift": "GJ Pitch Shift (duration preserved)",
     "GJ_EncodeVideo": "GJ Encode Video (MP4 file)",
     "GJ_LoadSavedVideo": "GJ Load Saved Video (skip recompute)",
+    "GJ_FitToGrid": "GJ Fit To Grid (size x32, frames 17n+5)",
 }
